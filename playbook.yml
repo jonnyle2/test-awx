@@ -5,4 +5,6 @@
   tasks:
     - name: Hello Message
       debug:
-        msg: "Hello {{ message }}!"
+        msg: "Hello {{ item }}!"
+      loop: "{{ vlan_ids }}"
+
