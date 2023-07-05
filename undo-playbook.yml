@@ -1,0 +1,30 @@
+- name: Undo Test
+  hosts: "all"
+  gather_facts: no
+  tasks:
+    - name: Gather vlans facts from the device
+      arista.eos.eos_vlans:
+        state: gathered
+      register: before_playbook
+    - name: Display VLAN facts before playbook
+      debug:
+       var: before_playbook
+    - name: Undo Interfaces
+      arista.eos.eos_l2_interfaces:
+        config:
+        - name: "{{ item.1.name }}"
+        state: deleted
+      loop: "{{ vlans | subelements('ports') }}"
+    - name: Undo VLANs
+      arista.eos.eos_vlans:
+        config:
+        - vlan_id: "{{ item.id }}"
+        state: deleted
+      loop: "{{ vlans }}"
+    - name: Gather vlans facts from the device
+      arista.eos.eos_vlans:
+        state: gathered
+      register: after_playbook
+    - name: Display VLAN facts after playbook
+      debug:
+       var: after_playbook

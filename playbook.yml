@@ -1,11 +1,34 @@
-- name: Testing Nested Loops
-  hosts: all
+- name: Provision Arista Switch VLAN
+  hosts: "all"
+  gather_facts: no
   tasks:
-    - name: Creating VLAN
+    - name: Gather vlans facts from the device
+      arista.eos.eos_vlans:
+        state: gathered
+      register: before_playbook
+    - name: Display VLAN facts before playbook
       debug:
-        msg: "Creating VLAN {{ item.id }}..."
+       var: before_playbook
+    - name: Create New VLAN
+      arista.eos.eos_vlans:
+        config:
+        - vlan_id: "{{ item.id }}"
+          name: "{{ item.name | default(omit) }}"
+          state: active
       loop: "{{ vlans }}"
-    - name: Adding ports to VLAN
+      register: new_vlan_response
+    - name: Display New VLAN Information
       debug:
-        msg: "Adding port {{ item.1.port }} for vlan {{ item.0.name }}..."
+        var: new_vlan_reponse
+    - name: Add Ports to VLAN
+      arista.eos.eos_l2_interfaces:
+        config:
+        - name: "{{ item.1.name }}"
+          mode: access
+          access:
+            vlan: "{{ item.0.id }}"
       loop: "{{ vlans | subelements('ports') }}"
+    # - name: Copy running-config To startup-config
+    #   arista.eos.eos_command:
+    #     commands:
+    #     - command: copy running-config startup-config
