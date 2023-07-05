@@ -1,10 +1,11 @@
-- name: Hello Var Sample
+- name: Testing Nested Loops
   hosts: all
-  vars:
-    message: World
   tasks:
-    - name: Hello Message
+    - name: Creating VLAN
       debug:
-        msg: "Hello {{ item }}!"
-      loop: "{{ vlan_ids }}"
-
+        msg: "Creating VLAN {{ item.id }}..."
+      loop: "{{ vlans }}"
+    - name: Adding ports to VLAN
+      debug:
+        msg: "Adding port {{ item.1.port }} for vlan {{ item.0.name }}..."
+      loop: "{{ vlans | subelements('ports') }}"
