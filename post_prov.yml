@@ -1,0 +1,14 @@
+- name: Post Provision Configurations
+  hosts: "all"
+  gather_facts: no
+  tasks:
+    - name: Add authorized key to root
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        key: "{{ public_key }}"
+
+    - name: Disable root password login
+      ansible.builtin.user:
+        name: root
+        password_lock: true
