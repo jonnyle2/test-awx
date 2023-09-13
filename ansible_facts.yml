@@ -1,6 +1,8 @@
 - name: Debug Distribution Facts
   hosts: "all"
   gather_subset:
+    - "!all"
+    - "!min"
     - distribution
     - os_family
   tasks:
