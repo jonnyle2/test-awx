@@ -1,7 +1,8 @@
 - name: Debug Distribution Facts
   hosts: "all"
   gather_subset:
-    - "min"
+    - distribution
+    - os_family
   tasks:
     - name: Print all available facts
       ansible.builtin.debug:
