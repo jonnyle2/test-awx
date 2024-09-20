@@ -1,11 +1,31 @@
 - name: Debug Distribution Facts
-  hosts: "all"
-  gather_subset:
-    - "!all"
-    - "!min"
-    - distribution
-    - os_family
+  hosts: all
+  gather_facts: false
   tasks:
-    - name: Print all available facts
+    - name: Gather vlan facts
+      cisco.nxos.nxos_vlans:
+        state: gathered
+      register: vlans
+    - name: Print vlan facts
       ansible.builtin.debug:
-        var: ansible_facts
+        var: vlans
+    - name: Gather Ethernet1/1 interface facts
+      cisco.nxos.nxos_interfaces:
+        state: gathered
+        config:
+          - name: Ethernet1/1
+      register: ints
+    - name: Print Ethernet1/1 interface facts
+      ansible.builtin.debug:
+        var: ints
+    - name: Enable Ethernet1/1 interface
+      cisco.nxos.nxos_interfaces:
+        config:
+          - name: Ethernet1/1
+            description: Configured by Ansible
+            enabled: false
+        state: merged
+      register: ints_after
+    - name: Ethernet1/1 interface facts after
+      ansible.builtin.debug:
+        var: ints_after
